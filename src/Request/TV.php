@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
 /**
@@ -58,6 +59,28 @@ class TV extends RequestCollection
         }
 
         return $request->getResponse(new Response\TVChannelsResponse());
+    }
+
+    /**
+     * Uploads a video to your Instagram TV.
+     *
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see Internal::configureSingleVideo() for available metadata fields.
+     */
+    public function uploadVideo(
+        $videoFilename,
+        array $externalMetadata = [])
+    {
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_TV, $videoFilename, null, $externalMetadata);
     }
 
     /**

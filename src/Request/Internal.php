@@ -437,6 +437,7 @@ class Internal extends RequestCollection
         if ($targetFeed !== Constants::FEED_TIMELINE
             && $targetFeed !== Constants::FEED_STORY
             && $targetFeed !== Constants::FEED_DIRECT_STORY
+            && $targetFeed !== Constants::FEED_TV
         ) {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
@@ -579,6 +580,9 @@ class Internal extends RequestCollection
         case Constants::FEED_STORY:
             $endpoint = 'media/configure_to_story/';
             break;
+        case Constants::FEED_TV:
+            $endpoint = 'media/configure_to_igtv/';
+            break;
         default:
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
@@ -607,7 +611,8 @@ class Internal extends RequestCollection
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
-
+        /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
+        $title = (isset($externalMetadata['title']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['title'] : null;
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
             $captionText = '';
@@ -700,6 +705,14 @@ class Internal extends RequestCollection
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))
                     ->addPost('client_timestamp', time());
+                break;
+            case Constants::FEED_TV:
+                if ($title !== null) {
+                    throw new \InvalidArgumentException('You must provide a title for the media.');
+                }
+                $request
+                    ->addPost('title', $title)
+                    ->addPost('caption', $captionText);
                 break;
         }
 
