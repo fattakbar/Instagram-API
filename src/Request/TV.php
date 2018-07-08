@@ -25,10 +25,10 @@ class TV extends RequestCollection
     }
 
     /**
-     * Get channels.
+     * Get channel.
      *
-     * You can filter the channels in 5 ids: 'for_you', 'chrono_following', 'popular', 'continue_watching'
-     * and using a user ID in the following format: 'user_1234567891'
+     * You can filter the channel with different IDs: 'for_you', 'chrono_following', 'popular', 'continue_watching'
+     * and using a user ID in the following format: 'user_1234567891'.
      *
      * @param string      $id    ID used to filter channels.
      * @param null|string $maxId Next "maximum ID", used for pagination.
@@ -38,12 +38,12 @@ class TV extends RequestCollection
      *
      * @return \InstagramAPI\Response\TVChannelsResponse
      */
-    public function getChannels(
+    public function getChannel(
         $id = 'for_you',
         $maxId = null)
     {
         if (!in_array($id, ['for_you', 'chrono_following', 'popular', 'continue_watching'])
-        && !preg_match('/(user_)[1-9][0-9]*$/', $id)) {
+        && !preg_match('/^user_[1-9]\d*$/', $id)) {
             throw new \InvalidArgumentException('Invalid ID type.');
         }
 
@@ -99,8 +99,11 @@ class TV extends RequestCollection
         }
 
         $seenState = json_encode([
-            'impressions'       => $impression,
-            'view_progress_s'   => $viewProgress,
+            'impressions'       => [
+                $impression => [
+                    'view_progress_s'   => $viewProgress,
+                ],
+            ],
             'grid_impressions'  => $gridImpressions,
         ]);
 
