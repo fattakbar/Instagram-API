@@ -43,7 +43,7 @@ class TV extends RequestCollection
         $maxId = null)
     {
         if (!in_array($id, ['for_you', 'chrono_following', 'popular', 'continue_watching'])
-        && strpos($id, 'user_')) {
+        && !preg_match('/(user_)[1-9][0-9]*$/', $id)) {
             throw new \InvalidArgumentException('Invalid ID type.');
         }
 
@@ -81,7 +81,7 @@ class TV extends RequestCollection
      * Write seen state on a video.
      *
      * @param string $impression      Format: 1813637917462151382
-     * @param int    $viewProgress    Video view progres progress in seconds.
+     * @param int    $viewProgress    Video view progress in seconds.
      * @param mixed  $gridImpressions TODO No info yet.
      *
      * @throws \InvalidArgumentException
@@ -95,8 +95,7 @@ class TV extends RequestCollection
         $gridImpressions = [])
     {
         if (!ctype_digit($viewProgress) && (!is_int($viewProgress) || $viewProgress < 0)) {
-            throw new \InvalidArgumentException(
-                'View progress must be a positive integer.');
+            throw new \InvalidArgumentException('View progress must be a positive integer.');
         }
 
         $seenState = json_encode([
